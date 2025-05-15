@@ -1,0 +1,56 @@
+datasource db {
+  provider = "sqlite"
+  // Wasp requires that the url is set to the DATABASE_URL environment variable.
+  url      = env("DATABASE_URL")
+}
+
+// Wasp requires the `prisma-client-js` generator to be present.
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+    id         Int          @id @default(autoincrement())
+    userType   String
+    tasks      Task[]
+    rewards    Reward[]
+    badges     Badge[]
+    Submission Submission[]
+}
+
+model Task {
+    id          Int          @id @default(autoincrement())
+    title       String
+    description String
+    location    String
+    isCompleted Boolean      @default(false)
+    ngo         User         @relation(fields: [ngoId], references: [id])
+    ngoId       Int
+    submissions Submission[]
+}
+
+model Reward {
+    id          Int      @id @default(autoincrement())
+    description String
+    validUntil  DateTime
+    user        User     @relation(fields: [userId], references: [id])
+    userId      Int
+}
+
+model Badge {
+    id          Int    @id @default(autoincrement())
+    name        String
+    description String
+    user        User   @relation(fields: [userId], references: [id])
+    userId      Int
+}
+
+model Submission {
+    id          Int     @id @default(autoincrement())
+    photoUrl    String
+    isApproved  Boolean @default(false)
+    task        Task    @relation(fields: [taskId], references: [id])
+    taskId      Int
+    volunteer   User    @relation(fields: [volunteerId], references: [id])
+    volunteerId Int
+}
